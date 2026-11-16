@@ -1962,12 +1962,12 @@ nav .sec li a[aria-current="location"] { border-left-color:#2c65c2; }
     block.querySelector('[data-m3-pay-total-label]').textContent = m3PayKinds[kind].total + ' (' + entries.length + ' รายการ)';
     block.querySelector('[data-m3-pay-total-value]').textContent = m2Money(paid / 100);
     const status = block.querySelector('[data-m3-pay-status]');
-    if (diff > 0 && kind === 'deposit') {
+    if (kind === 'booking' && diff !== 0) {
+      status.textContent = 'กรุณาตรวจสอบยอดชำระเงินจอง';
+    } else if (diff > 0 && kind === 'deposit') {
       const label = document.createElement('strong');
       label.textContent = m3PayKinds[kind].label;
       status.replaceChildren('กรุณาชำระ', label, 'ให้ถูกต้อง');
-    } else if (diff > 0) {
-      status.textContent = 'กรุณาชำระเงินจองให้ถูกต้อง';
     } else if (diff < 0) {
       status.textContent = 'ยอดชำระ' + m3PayKinds[kind].label + 'เกิน ' + m2Money(-diff / 100) + ' แก้ไขหรือลบรายการ';
     } else {
