@@ -217,6 +217,8 @@ nav .sec li a[aria-current="location"] { border-left-color:#2c65c2; }
 .m3-pay-row { display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:start; gap:12px; padding:8px 0; border-bottom:1px solid var(--m1-line); font-variant-numeric:tabular-nums; }
 .m3-pay-tag { display:grid; place-items:center; width:40px; height:40px; border-radius:8px; background:#eee; color:#555; font-size:12px; }
 .m3-pay-row strong { display:block; font-size:15px; }
+.m3-pay-heading-line { display:flex; flex-wrap:wrap; align-items:baseline; gap:2px 8px; }
+.m3-pay-heading-line small { white-space:nowrap; }
 .m3-pay-row small { display:block; color:#666; font-size:12px; }
 .m3-pay-row output { align-self:center; font-size:15px; font-weight:700; }
 .m3-pay-edit { min-height:32px; padding:0; margin-top:4px; border:0; background:transparent; color:#222; font:inherit; font-size:14px; text-decoration:underline; cursor:pointer; }
@@ -1940,7 +1942,10 @@ nav .sec li a[aria-current="location"] { border-left-color:#2c65c2; }
       title.textContent = name;
       const when = document.createElement('small');
       when.textContent = entry.date + ' | ' + entry.time;
-      text.append(title, when);
+      const heading = document.createElement('div');
+      heading.className = 'm3-pay-heading-line';
+      heading.append(title, when);
+      text.append(heading);
       if (entry.proofs) {
         const proof = document.createElement('small');
         proof.textContent = 'หลักฐานการชำระเงิน ' + entry.proofs + ' รูป';
