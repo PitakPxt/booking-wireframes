@@ -225,7 +225,7 @@ nav .sec li a[aria-current="location"] { border-left-color:#2c65c2; }
 .m3-pay-block[data-state="error"] .m3-pay-total { background:#fde8e6; color:#b42318; }
 .m3-screen .m3-pay-status { margin:6px 0 0; color:#666; font-size:13px; }
 .m3-screen .m3-pay-block[data-state="error"] .m3-pay-status { color:#b42318; }
-.m3-screen .m3-pay-block[data-state="ok"] .m3-pay-status { color:#222; font-weight:700; }
+.m3-screen .m3-pay-status:empty { margin:0; }
 .m3-pay-add { width:100%; min-height:44px; margin-top:10px; padding:8px 12px; border:1px solid #777; border-radius:22px; background:#fff; color:#222; font:inherit; font-weight:700; cursor:pointer; }
 /* Add or edit one received payment: a full page inside the frame. */
 .m3-pay-page.m2-gift-page > .m2-extra-form { grid-template-rows:auto minmax(0,1fr) auto; }
@@ -1906,7 +1906,7 @@ nav .sec li a[aria-current="location"] { border-left-color:#2c65c2; }
   const m3Round2 = value => Math.round(value * 100) / 100;
   // Received payments, kept per card (P1): booking deposit and accessory deposit.
   const m3PayKinds = {
-    booking: {label:'เงินจอง', add:'เพิ่มรายการชำระเงินจอง', edit:'แก้ไขรายการชำระเงินจอง', total:'รวมเงินจองที่ชำระ'},
+    booking: {label:'เงินจอง', add:'เพิ่มรายการชำระเงินจอง', edit:'แก้ไขรายการชำระเงินจอง', total:'รวมเงินจองทั้งหมด'},
     deposit: {label:'มัดจำอุปกรณ์', add:'เพิ่มรายการชำระมัดจำอุปกรณ์', edit:'แก้ไขรายการชำระมัดจำอุปกรณ์', total:'รวมมัดจำอุปกรณ์ที่ชำระ'},
   };
   const m3Methods = {cash:['เงินสด','สด'], transfer:['เงินโอน','โอน'], card:['บัตรเครดิต','บัตร'], cheque:['เช็ค','เช็ค']};
@@ -1961,9 +1961,18 @@ nav .sec li a[aria-current="location"] { border-left-color:#2c65c2; }
     block.querySelector('[data-m3-pay-none]').hidden = entries.length > 0;
     block.querySelector('[data-m3-pay-total-label]').textContent = m3PayKinds[kind].total + ' (' + entries.length + ' รายการ)';
     block.querySelector('[data-m3-pay-total-value]').textContent = m2Money(paid / 100);
-    block.querySelector('[data-m3-pay-status]').textContent = diff === 0 ? 'ชำระครบแล้ว'
-      : diff > 0 ? 'ยอดชำระ' + m3PayKinds[kind].label + 'ยังไม่ครบ ขาดอีก ' + m2Money(diff / 100)
-      : 'ยอดชำระ' + m3PayKinds[kind].label + 'เกิน ' + m2Money(-diff / 100) + ' แก้ไขหรือลบรายการ';
+    const status = block.querySelector('[data-m3-pay-status]');
+    if (diff > 0 && kind === 'deposit') {
+      const label = document.createElement('strong');
+      label.textContent = m3PayKinds[kind].label;
+      status.replaceChildren('กรุณาชำระ', label, 'ให้ถูกต้อง');
+    } else if (diff > 0) {
+      status.textContent = 'กรุณาชำระเงินจองให้ถูกต้อง';
+    } else if (diff < 0) {
+      status.textContent = 'ยอดชำระ' + m3PayKinds[kind].label + 'เกิน ' + m2Money(-diff / 100) + ' แก้ไขหรือลบรายการ';
+    } else {
+      status.textContent = '';
+    }
     // Short of the amount is neutral until "ถัดไป" is pressed; more than the amount is always an error.
     block.dataset.state = diff === 0 ? 'ok' : diff < 0 || m3State.payRequired ? 'error' : 'pending';
     return {paid, ok: diff === 0};
